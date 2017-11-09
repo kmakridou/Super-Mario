@@ -161,6 +161,8 @@ body {
 
 		function goombaOverlap(player, goomba) {
 			if (player.body.touching.down) {
+				scr += 200;
+				score.text = "Score: " +scr;
                                 goombasound.play();
 				goomba.animations.stop();
 				goomba.frame = 2;
