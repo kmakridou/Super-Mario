@@ -101,11 +101,11 @@ body {
                         soundc = this.add.audio('ihos');
                         goombasound = this.add.audio('goombasound');
 			game.camera.follow(player);
-                        score = game.add.text(20, 10, "Score: " + scr, {fontSize: 12, fill: 'white'});
+                        score = game.add.text(20, 10, "Score: " + scr, {fontSize: 12});
                         score.fixedToCamera = true;
                         heart = game.add.sprite(200, 10, 'lives');
                         heart.fixedToCamera = true;
-                        hearttext = game.add.text(220, 10, '*' + hearts, {fontSize: 10, fill: 'white'});
+                        hearttext = game.add.text(220, 10, '*' + hearts, {fontSize: 10});
                         hearttext.fixedToCamera = true;
                         gameover = this.add.audio('gameover');
 			cursors = game.input.keyboard.createCursorKeys();
