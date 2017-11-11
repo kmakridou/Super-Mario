@@ -154,7 +154,7 @@ body {
 		}
 
 		function coinOverlap(player, coin) {
-                        scr += 100;
+                        scr += 50;
                         score.text = "Score: " +scr;
 			soundc.play();
 			coin.kill();
@@ -162,7 +162,7 @@ body {
 
 		function goombaOverlap(player, goomba) {
 			if (player.body.touching.down) {
-				scr += 200;
+				scr += 100;
 				score.text = "Score: " +scr;
                                 goombasound.play();
 				goomba.animations.stop();
