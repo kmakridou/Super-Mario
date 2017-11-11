@@ -73,7 +73,7 @@ body {
 			coins.enableBody = true;
 			map.createFromTiles(2, null, 'coin', 'stuff', coins);
 			coins.callAll('animations.add', 'animations', 'spin',
-					[ 0, 0, 1, 2, 3, 4, 5, 6], 10, true);
+					[ 0, 0, 1, 2, 3, 4, 5, 6, 7, 8], 10, true);
 			coins.callAll('animations.play', 'animations', 'spin');
 
 			goombas = game.add.group();
@@ -88,7 +88,7 @@ body {
 
 			player = game.add.sprite(16, game.world.height - 48, 'mario');
 			game.physics.arcade.enable(player);
-			player.body.gravity.y = 370;
+			player.body.gravity.y = 300;
 			player.body.collideWorldBounds = true;
 			player.animations.add('walkRight', [ 1, 2, 3 ], 10, true);
 			player.animations.add('walkLeft', [ 8, 9, 10 ], 10, true);
