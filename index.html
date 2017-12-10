@@ -24,23 +24,24 @@ body {
 
 			//  We need this because the assets are on github pages
 			//  Remove the next 2 lines if running locally
-			// this.load.baseURL = 'https://ioniodi.github.io/Super-Mario/';
-			// this.load.crossOrigin = 'anonymous';
+            //this.load.baseURL = 'https://kmakridou.github.io/Super-Mario/';
+            //this.load.crossOrigin = 'kmakridou';
 
 			this.load.spritesheet('tiles', 'assets/super_mario_tiles.png', 16,
 					16);
 			this.load.spritesheet('goomba', 'assets/goomba.png', 16, 16);
 			this.load.spritesheet('mario', 'assets/barbamario.png', 16, 16);
 			this.load.spritesheet('coin', 'assets/coins.png', 16, 16);
+            this.load.spritesheet('enemy', 'assets/enemies.png', 16, 16);
                         
-                        this.load.image('lives', 'assets/lives.png', 16, 16);
+            this.load.image('lives', 'assets/lives.png', 16, 16);
 
-                        this.load.audio('music', 'audio/themesong.mp3');
-                        this.load.audio('ihos', 'audio/key.wav');
-                        this.load.audio('failsound', 'audio/fail.mp3');
-                        this.load.audio('jumpsound', 'audio/jumpsound.mp3');
-                        this.load.audio('goombasound', 'audio/stomp.wav');
-                        this.load.audio('gameover', 'audio/gameoversound.mp3');
+            this.load.audio('music', 'audio/themesong.mp3');
+            this.load.audio('ihos', 'audio/key.wav');
+            this.load.audio('failsound', 'audio/fail.mp3');
+            this.load.audio('jumpsound', 'audio/jumpsound.mp3');
+            this.load.audio('goombasound', 'audio/stomp.wav');
+            this.load.audio('gameover', 'audio/gameoversound.mp3');
 
 			this.load.tilemap('level', 'assets/sm2.json', null,
 					Phaser.Tilemap.TILED_JSON);
@@ -85,7 +86,16 @@ body {
 			goombas.setAll('body.bounce.x', 1);
 			goombas.setAll('body.velocity.x', -20);
 			goombas.setAll('body.gravity.y', 500);
-
+            
+            enemies = game.add.group();
+            enemies.enableBody = true;
+            map.createFromTiles(4, null, 'enemy', 'stuff', enemies);
+            enemies.callAll('animations.add', 'animations', 'walk', [0,1,0], 1, true);
+            enemies.callAll('animations.play', 'animations', 'walk');
+            enemies.setAll('body.bounce.x', 1);
+            enemies.setAll('body.velocity.x', -80);
+            enemies.setAll('body.gravity.y', 500);
+            
 			player = game.add.sprite(16, game.world.height - 48, 'mario');
 			game.physics.arcade.enable(player);
 			player.body.gravity.y = 300;
@@ -93,32 +103,39 @@ body {
 			player.animations.add('walkRight', [ 1, 2, 3 ], 10, true);
 			player.animations.add('walkLeft', [ 8, 9, 10 ], 10, true);
 			player.goesRight = true;
-                        music = game.add.audio('music');
-                        music.volume = 0.5;
+            music = game.add.audio('music');
+            music.volume = 0.5;
 			music.loop = true;
-                        music.play();
-                        failsound = game.add.audio('failsound');
-                        jumpsound = game.add.audio('jumpsound');
-                        soundc = this.add.audio('ihos');
-                        goombasound = this.add.audio('goombasound');
+            music.play();
+            failsound = game.add.audio('failsound');
+            jumpsound = game.add.audio('jumpsound');
+            soundc = this.add.audio('ihos');
+            goombasound = this.add.audio('goombasound');
 			game.camera.follow(player);
-                        score = game.add.text(20, 10, "Score: " + scr, {fontSize: 15});
-                        score.fixedToCamera = true;
-                        heart = game.add.sprite(200, 10, 'lives');
-                        heart.fixedToCamera = true;
-                        hearttext = game.add.text(220, 10, '*' + hearts, {fontSize: 15});
-                        hearttext.fixedToCamera = true;
-                        gameover = this.add.audio('gameover');
+            score = game.add.text(20, 10, "Score: " + scr, {fontSize: 15});
+            score.fixedToCamera = true;
+            heart = game.add.sprite(200, 10, 'lives');
+            heart.fixedToCamera = true;
+            hearttext = game.add.text(220, 10, '*' + hearts, {fontSize: 15});
+            hearttext.fixedToCamera = true;
+            gameover = this.add.audio('gameover');
 			cursors = game.input.keyboard.createCursorKeys();
 			
 		}
-                var soundc;
+            var soundc;
 
 		function update() {
 			game.physics.arcade.collide(player, layer);
 			game.physics.arcade.collide(goombas, layer);
+            game.physics.arcade.collide(enemies, layer);
+            game.physics.arcade.overlap(player, enemies, goombaOverlap);
 			game.physics.arcade.overlap(player, goombas, goombaOverlap);
 			game.physics.arcade.overlap(player, coins, coinOverlap);
+            
+            if (player.x <= 448 && player.x >= 429 && player.y == 224){
+                player.position.x = 1494.5;
+                player.position.y = 224;
+            }
 
 			if (player.body.enable) {
 				player.body.velocity.x = 0;
@@ -141,7 +158,7 @@ body {
 				if (cursors.up.isDown && player.body.onFloor()) {
 					player.body.velocity.y = -190;
 					player.animations.stop();
-                                        jumpsound.play();
+                    jumpsound.play();
 				}
 
 				if (player.body.velocity.y != 0) {
@@ -154,8 +171,8 @@ body {
 		}
 
 		function coinOverlap(player, coin) {
-                        scr += 50;
-                        score.text = "Score: " +scr;
+            scr += 50;
+            score.text = "Score: " +scr;
 			soundc.play();
 			coin.kill();
 		}
@@ -164,39 +181,45 @@ body {
 			if (player.body.touching.down) {
 				scr += 100;
 				score.text = "Score: " +scr;
-                                goombasound.play();
+                goombasound.play();
 				goomba.animations.stop();
 				goomba.frame = 2;
 				goomba.body.enable = false;
 				player.body.velocity.y = -80;
-				game.time.events.add(Phaser.Timer.SECOND, function() {
-					goomba.kill();
-				});
+                if(goombas.children.indexOf(goomba) >- 1){
+                    game.time.events.add(Phaser.Timer.SECOND, function() {
+				        goomba.kill();
+                    });
+                }else{
+                    goomba.kill();
+                    scr += 150;
+                    score.text = "Score: ", scr;
+                }
 			} else {
 				player.frame = 6;
 				player.body.enable = false;
 				player.animations.stop();
-                                failsound.play();
-                                hearts -= 1;
-                                hearttext.text = '*' + hearts;
-                                if (hearts == 0){
-                                       var gameover1;
-                                       gameover1 = game.add.text(5, 100, 'GAME OVER.', {fontSize: 35});
-                                       gameover1.fixedToCamera = true; 
-                                       music.stop();
-                                       failsound.stop();
-                                       gameover.play();
-                                       game.time.events.add(Phaser.Timer.SECOND * 2, function() {
-                                              location.reload();
-					      });
-                                }
-                                else{
-				       game.time.events.add(Phaser.Timer.SECOND * 2, function() {
-				              music.stop();
-                                              scr = 0;
-                                              game.state.restart();
-				              });
-                                 }
+                failsound.play();
+                hearts -= 1;
+                hearttext.text = '*' + hearts;
+                if (hearts == 0){
+                    var gameover1;
+                    gameover1 = game.add.text(5, 100, 'GAME OVER.', {fontSize: 35});
+                    gameover1.fixedToCamera = true; 
+                    music.stop();
+                    failsound.stop();
+                    gameover.play();
+                    game.time.events.add(Phaser.Timer.SECOND * 2, function() {
+                        location.reload();
+				    });
+                }
+                else{
+				    game.time.events.add(Phaser.Timer.SECOND * 2, function() {
+				    music.stop();
+                    scr = 0;
+                    game.state.restart();
+				    });
+                }
 			}
 		}
 	</script>
